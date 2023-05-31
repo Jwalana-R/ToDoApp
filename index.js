@@ -3,8 +3,6 @@ const app = express();
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 
-app.set("view engine", "ejs");
-
 //models
 const TodoTask = require("./models/TodoTask");
 
@@ -17,10 +15,10 @@ app.use(express.urlencoded({ extended: true }));
 mongoose.set("useFindAndModify", false);
 mongoose.connect(process.env.DB_CONNECT, { useNewUrlParser: true }, () => {
   console.log("Connected to db!");
-  app.listen(3000, () => {
-    console.log("Server Up and running");
-  });
+  app.listen(3000, () => console.log("Server Up and running"));
 });
+
+app.set("view engine", "ejs");
 
 // app.get("/", (req, res) => {
 //   res.send("Hello World!");
@@ -29,13 +27,28 @@ mongoose.connect(process.env.DB_CONNECT, { useNewUrlParser: true }, () => {
 // GET METHOD
 app.get("/", (req, res) => {
   TodoTask.find({}, (err, tasks) => {
+    console.log(err);
+    console.log(tasks);
     res.render("todo.ejs", { todoTasks: tasks });
   });
 });
 
-app.post("/", (req, res) => {
-  console.log(req.body);
+// app.get("/", (req, res) => {
+//   try {
+//     res.render("todo.ejs");
+//   } catch (err) {
+//     console.log(err);
+//     return res.send("error");
+//   }
+// });
+
+app.get("/", (req, res) => {
+  res.render("todo.ejs");
 });
+
+// app.post("/", (req, res) => {
+//   console.log(req.body);
+// });
 
 //POST METHOD
 app.post("/", async (req, res) => {
@@ -46,6 +59,7 @@ app.post("/", async (req, res) => {
     await todoTask.save();
     res.redirect("/");
   } catch (err) {
+    console.log(err);
     res.redirect("/");
   }
 });
